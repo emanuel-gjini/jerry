@@ -3697,6 +3697,11 @@ input[type=submit].btn-block,input[type=reset].btn-block,input[type=button].btn-
 	display: inline-block;
 }
 
+.nav-link.notifications {
+	cursor: pointer;
+    user-select: none;
+}
+
 .nav-link.notifications .badge {
 	background: red;
     color: white;
