@@ -29,10 +29,10 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
 
-    'jerry.apps.articles',
-    'jerry.apps.authentication',
-    'jerry.apps.core',
-    'jerry.apps.profiles',
+    'articles',
+    'authentication',
+    'core',
+    'profiles',
 ]
 
 MIDDLEWARE = [
@@ -48,12 +48,14 @@ MIDDLEWARE = [
 
 
 
-ROOT_URLCONF = 'jerry.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'frontend'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -66,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'jerry.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database
@@ -75,7 +77,7 @@ WSGI_APPLICATION = 'jerry.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'backend/db.sqlite3'),
     }
 }
 
@@ -117,6 +119,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend', 'build', 'static'),
+]
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
     'http://0.0.0.0:4100',
@@ -130,11 +135,11 @@ CORS_ORIGIN_WHITELIST = (
 AUTH_USER_MODEL = 'authentication.User'
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'jerry.apps.core.exceptions.core_exception_handler',
+    'EXCEPTION_HANDLER': 'core.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'jerry.apps.authentication.backends.JWTAuthentication',
+        'authentication.backends.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 20,

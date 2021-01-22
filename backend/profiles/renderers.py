@@ -1,4 +1,4 @@
-from jerry.apps.core.renderers import JerryJSONRenderer
+from core.renderers import JerryJSONRenderer
 
 
 class ProfileJSONRenderer(JerryJSONRenderer):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from jerry.apps.profiles.serializers import ProfileSerializer
+from profiles.serializers import ProfileSerializer
 
 from .models import Article, Comment, Tag
 from .relations import TagRelatedField

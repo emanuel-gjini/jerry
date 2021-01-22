@@ -2,11 +2,11 @@ from django.apps import AppConfig
 
 
 class ArticlesAppConfig(AppConfig):
-    name = 'jerry.apps.articles'
+    name = 'articles'
     label = 'articles'
     verbose_name = 'Articles'
 
     def ready(self):
-        import jerry.apps.articles.signals
+        import articles.signals
 
-default_app_config = 'jerry.apps.articles.ArticlesAppConfig'
+default_app_config = 'articles.ArticlesAppConfig'
