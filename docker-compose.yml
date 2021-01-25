@@ -7,7 +7,7 @@ services:
     build: .
     command: python3 backend/manage.py runserver 0.0.0.0:9000
     volumes:
-      - '.:/code:delegated'
+      - '.:/codebase:delegated'
     ports:
       - "9000:9000"
     depends_on:
