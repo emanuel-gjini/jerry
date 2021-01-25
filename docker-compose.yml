@@ -5,10 +5,10 @@ services:
     image: "redis:alpine"
   jerry:
     build: .
-    command: python3 backend/manage.py runserver 0.0.0.0:8000
+    command: python3 backend/manage.py runserver 0.0.0.0:9000
     volumes:
       - ./:/code
     ports:
-      - "8000:8000"
+      - "9000:9000"
     depends_on:
       - redis
