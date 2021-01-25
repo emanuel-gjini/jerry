@@ -1,7 +1,9 @@
 from django.db import models
+from django.dispatch import Signal, receiver
 
 from core.models import TimestampedModel
 
+follow_updated = Signal(providing_args=['following', 'profile'])
 
 class Profile(TimestampedModel):
     # As mentioned, there is an inherent relationship between the Profile and
@@ -44,10 +46,12 @@ class Profile(TimestampedModel):
     def follow(self, profile):
         """Follow `profile` if we're not already following `profile`."""
         self.follows.add(profile)
+        follow_updated.send(sender=self.__class__, instance=self, follow=True, profile=profile)
 
     def unfollow(self, profile):
         """Unfollow `profile` if we're already following `profile`."""
         self.follows.remove(profile)
+        follow_updated.send(sender=self.__class__, instance=self, follow=False, profile=profile)
 
     def is_following(self, profile):
         """Returns True if we're following `profile`; False otherwise."""

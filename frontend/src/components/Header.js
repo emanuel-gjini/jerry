@@ -1,5 +1,8 @@
 import React from 'react';
+import agent from '../agent';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { NOTIFICATIONS } from '../constants/actionTypes';
 
 const LoggedOutView = props => {
   if (!props.currentUser) {
@@ -54,14 +57,17 @@ const LoggedInView = props => {
         </li>
 
         <li className="nav-item">
-          <div className="nav-link notifications">
-            <span className="badge">
-              1
+          <Link
+            to={'/notifications'}
+            className="nav-link notifications">
+            {!!props.notificationsCount && <span className="badge">
+              {props.notificationsCount}
             </span>
+            }
             <i className="ion-android-notifications-none"></i>&nbsp;Notifications
-          </div>
+          </Link>
         </li>
-        
+
         <li className="nav-item">
           <Link
             to={`/@${props.currentUser.username}`}
@@ -78,7 +84,21 @@ const LoggedInView = props => {
   return null;
 };
 
+const mapStateToProps = state => ({
+  notificationsCount: state.notificationList.notifications && state.notificationList.notifications.length,
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadNotifications: (payload) =>
+    dispatch({ type: NOTIFICATIONS, payload }),
+});
+
 class Header extends React.Component {
+
+  componentDidMount() {
+    this.props.loadNotifications(agent.Notifications.get());
+  }
+
   render() {
     return (
       <nav className="navbar navbar-light">
@@ -90,11 +110,11 @@ class Header extends React.Component {
 
           <LoggedOutView currentUser={this.props.currentUser} />
 
-          <LoggedInView currentUser={this.props.currentUser} />
+          <LoggedInView currentUser={this.props.currentUser} notificationsCount={this.props.notificationsCount} />
         </div>
       </nav>
     );
   }
 }
 
-export default Header;
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

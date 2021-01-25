@@ -1,9 +1,10 @@
 import jwt
 
 from django.conf import settings
-
+from django.db import close_old_connections
 from rest_framework import authentication, exceptions
-
+from urllib.parse import parse_qs
+from channels.db import database_sync_to_async
 from .models import User
 
 
@@ -91,3 +92,33 @@ class JWTAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         return (user, token)
+
+
+@database_sync_to_async
+def get_user(user_id):
+    try:
+        return User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        msg = 'No user matching this token was found.'
+        raise exceptions.AuthenticationFailed(msg)
+
+class ChannelJWTAuthentication(authentication.BaseAuthentication):
+    def __init__(self, inner):
+        # Store the ASGI application we were provided with
+        self.inner = inner
+
+    async def __call__(self, scope, receive, send):
+        # Close old database connections to prevent usage of timed out connections
+        close_old_connections()
+        # Get the token
+        token = parse_qs(scope["query_string"].decode("utf8"))["token"][0]
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY)
+        except:
+            msg = 'Invalid authentication. Could not decode token.'
+            raise exceptions.AuthenticationFailed(msg)
+        user = await get_user(payload['id'])
+        if not user.is_active:
+            msg = 'This user has been deactivated.'
+            raise exceptions.AuthenticationFailed(msg)
+        return await self.inner(dict(scope, user=user, token=token), receive, send)

@@ -1,14 +1,14 @@
 import jwt
 
 from datetime import datetime, timedelta
-
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
 )
 from django.db import models
-
 from core.models import TimestampedModel
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 class UserManager(BaseUserManager):
@@ -137,3 +137,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')
+
+    def send_notification(self, notification_message):
+        async_to_sync(get_channel_layer().group_send)(
+            'notifications_for_user_id_{}'.format(self.pk),
+            {
+                'type': 'user_notification',
+                'message': notification_message
+            },
+        )

@@ -138,6 +138,11 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class Settings extends React.Component {
+  onClickLogout = () => {
+    window.webSocket.close();
+    window.webSocket = null;
+    this.props.onClickLogout();
+  }
   render() {
     return (
       <div className="settings-page">
@@ -157,7 +162,7 @@ class Settings extends React.Component {
 
               <button
                 className="btn btn-outline-danger"
-                onClick={this.props.onClickLogout}>
+                onClick={this.onClickLogout}>
                 Or click here to logout.
               </button>
 

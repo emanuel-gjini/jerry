@@ -86,11 +86,19 @@ const Profile = {
     requests.del(`/profiles/${username}/follow`)
 };
 
+const Notifications = {
+  get: () =>
+    requests.get('/notifications'),
+  read: id =>
+    requests.put(`/notifications/${id}`, { notification: { seen: true }})
+};
+
 export default {
   Articles,
   Auth,
   Comments,
   Profile,
   Tags,
+  Notifications,
   setToken: _token => { token = _token; }
 };

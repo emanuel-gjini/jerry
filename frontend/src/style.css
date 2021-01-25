@@ -3717,6 +3717,21 @@ input[type=submit].btn-block,input[type=reset].btn-block,input[type=button].btn-
     margin-left: -6px;
 }
 
+.notification-preview {
+	background: lightgreen;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    display: flex;
+	justify-content: space-between;
+	margin-bottom: 12px;
+	cursor: pointer;
+}
+
+.notifications-page {
+	margin-top: 35px;
+}
+
 .nav-link:focus,.nav-link:hover {
 	text-decoration: none;
 }

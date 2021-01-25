@@ -2,7 +2,7 @@ import agent from '../agent';
 import Header from './Header';
 import React from 'react';
 import { connect } from 'react-redux';
-import { APP_LOAD, REDIRECT } from '../constants/actionTypes';
+import { APP_LOAD, NEW_NOTIFICATION, REDIRECT } from '../constants/actionTypes';
 import { Route, Switch } from 'react-router-dom';
 import Article from '../components/Article';
 import Editor from '../components/Editor';
@@ -14,20 +14,25 @@ import Register from '../components/Register';
 import Settings from '../components/Settings';
 import { store } from '../store';
 import { push } from 'react-router-redux';
+import Notifications from './Notifications';
 
 const mapStateToProps = state => {
   return {
     appLoaded: state.common.appLoaded,
     appName: state.common.appName,
     currentUser: state.common.currentUser,
-    redirectTo: state.common.redirectTo
-  }};
+    redirectTo: state.common.redirectTo,
+    notificationsCount: state.notificationList.length,
+  }
+};
 
 const mapDispatchToProps = dispatch => ({
   onLoad: (payload, token) =>
     dispatch({ type: APP_LOAD, payload, token, skipTracking: true }),
   onRedirect: () =>
-    dispatch({ type: REDIRECT })
+    dispatch({ type: REDIRECT }),
+  onNewNotification: newNotification => 
+    dispatch({ type: NEW_NOTIFICATION, newNotification })
 });
 
 class App extends React.Component {
@@ -48,24 +53,46 @@ class App extends React.Component {
     this.props.onLoad(token ? agent.Auth.current() : null, token);
   }
 
+  componentDidUpdate() {
+    const token = window.localStorage.getItem('jwt');
+    if (token && !window.webSocket){
+
+      const webSocket = new WebSocket('ws://localhost:8000?token=' + token);
+      webSocket.onopen = e => {
+        console.log('open', e);
+      }
+      webSocket.onmessage = e => {
+        console.log(JSON.parse(e.data));
+        this.props.onNewNotification(JSON.parse(e.data));
+      }
+      webSocket.onerror = e => {
+        console.log('error', e);
+      }
+      window.webSocket = webSocket;
+    }
+  }
+
   render() {
     if (this.props.appLoaded) {
       return (
         <div>
           <Header
             appName={this.props.appName}
-            currentUser={this.props.currentUser} />
-            <Switch>
-            <Route exact path="/" component={Home}/>
+            currentUser={this.props.currentUser}
+            notificationsCount={this.props.notificationsCount}
+          />
+          <Switch>
+            <Route exact path="/" component={Home} />
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/editor/:slug" component={Editor} />
             <Route path="/editor" component={Editor} />
+            <Route path="/notifications" component={Notifications} />
             <Route path="/article/:id" component={Article} />
             <Route path="/settings" component={Settings} />
             <Route path="/@:username/favorites" component={ProfileFavorites} />
             <Route path="/@:username" component={Profile} />
-            </Switch>
+          </Switch>
         </div>
       );
     }
