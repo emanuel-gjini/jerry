@@ -57,7 +57,7 @@ class App extends React.Component {
     const token = window.localStorage.getItem('jwt');
     if (token && !window.webSocket){
 
-      const webSocket = new WebSocket('ws://channels.critias.io?token=' + token);
+      const webSocket = new WebSocket('wss://channels.critias.io?token=' + token);
       webSocket.onopen = e => {
         console.log('open', e);
       }
