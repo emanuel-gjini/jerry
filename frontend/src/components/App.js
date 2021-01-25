@@ -57,7 +57,7 @@ class App extends React.Component {
     const token = window.localStorage.getItem('jwt');
     if (token && !window.webSocket){
 
-      const webSocket = new WebSocket('ws://localhost:9000?token=' + token);
+      const webSocket = new WebSocket('ws://62.171.169.144:9000?token=' + token);
       webSocket.onopen = e => {
         console.log('open', e);
       }
